@@ -19,20 +19,20 @@ cp "$0" "$DESTINATION_PATH"
 num_processes=$(expr length "$CUDA_VISIBLE_DEVICES" / 2 + 1)
 
 
-accelerate launch --main_process_port 29501 --config_file=script/accelerate_configs/zero3.yaml \
-            --num_processes=$num_processes easyalign/algorithm_trl/sft.py \
+accelerate launch --config_file=script/accelerate_configs/zero2.yaml \
+            --num_processes=$num_processes easyalign/algorithms/sft.py \
             --model_name_or_path /data/public/model/Qwen2.5-1.5B-Instruct \
             --dataset_name /data3/public/dataset/OpenR1-Math-220K \
             --torch_dtype "bfloat16" \
             --attn_implementation flash_attention_2 \
-            --use_peft True \
+            --use_peft False \
             --bf16 True \
             --load_in_8bit False \
             --load_in_4bit False \
-            --num_train_epochs 3 \
+            --num_train_epochs 1 \
             --max_seq_length 4096 \
             --per_device_train_batch_size 2 \
-            --gradient_accumulation_steps 4 \
+            --gradient_accumulation_steps 8 \
             --gradient_checkpointing True \
             --learning_rate 4.0e-5 \
             --optim "adamw_torch" \
@@ -41,6 +41,7 @@ accelerate launch --main_process_port 29501 --config_file=script/accelerate_conf
             --logging_steps 100 \
             --save_strategy "epoch" \
             --report_to "none" \
+            --wandb_project "openr1" \
             --output_dir $OUTPUT_DIR 
 
 

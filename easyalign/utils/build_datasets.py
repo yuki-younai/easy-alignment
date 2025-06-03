@@ -22,6 +22,12 @@ def build_sft_dataset(tokenizer, data_path, max_seq_length) -> Dataset:
         return {
             "messages": messages
         }
+
+    #https://huggingface.co/datasets/open-r1/OpenR1-Math-220k
+    def split_prompt_and_responses_OpenR1(examples):
+        return {
+            "messages": examples['messages']
+        }
     def split_prompt_and_responses_alpaca(example) -> Dict[str, str]:
         prompt = tokenizer.apply_chat_template(
                 [{"role": "user", "content": example['instruction']+ example['input']}],
@@ -34,6 +40,8 @@ def build_sft_dataset(tokenizer, data_path, max_seq_length) -> Dataset:
     
     if 'alpaca' in data_path:
         train_dataset = train_dataset.map(split_prompt_and_responses_alpaca, remove_columns=train_dataset.column_names, num_proc=8)
+    elif 'OpenR1' in data_path:
+        train_dataset = train_dataset.map(split_prompt_and_responses_OpenR1, remove_columns=train_dataset.column_names, num_proc=8)
     else:
         ValueError()
     
